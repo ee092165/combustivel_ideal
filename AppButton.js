@@ -1,4 +1,4 @@
-import { UseState } from 'react';
+import { useState } from 'react';
 import { StyleSheet, View, Text, Pressable } from 'react-native';
 
 const Combustivel = Object.freeze({
@@ -10,12 +10,12 @@ typen = Object.freeze([
     'Gasolina'
 ]);
 
-function ResultPanel(props)
+function AppButton(props)
 {
     const [t, setT] = useState(-1);
     const [txt, setTXT] = useState("");
 
-    const calcT = (up = false) => {
+    const calcT = (up = false, set1, set2) => {
         let mx = 0, r = -1, tarr = [];
         props.price.forEach((e, i) => {
             if (e > mx)
@@ -28,28 +28,19 @@ function ResultPanel(props)
                 tarr.push("Preço de " + typen[i] + ": R$" + e);
         });
 
+        props.set(r);
         setT(r);
         if (up)
-            setTXT(tarr);
+            setTXT(tarr.join('\n'));
     }
-
-    calcT(true);
 
     return (
         <>
-            <Text>{txt.join('\n')}</Text>
-            <AppButton onPress={calcT}>{props.children}</AppButton>
-            <ResultCard type={t} price={props.price}/>
+            <Pressable onPress={calcT} style={[styles.but, props.style]}>
+                {props.children}
+                <Text style={styles.lowtext}>{txt}</Text>
+            </Pressable>
         </>
-    );
-}
-
-function AppButton(props)
-{
-    return (
-        <Pressable onPress={props.onPress}>
-            {props.children}
-        </Pressable>
     );
 }
 
@@ -68,26 +59,36 @@ function ResultCard(props)
     typen.forEach((e, i) => {
         if (i == props.type)
             return;
-        b.push(typen[props.type] + " está à " + ((props.price[props.type] / props.price[i]) * 100).toFixed(2) + "% de " + typen[i])
+        b.push(typen[props.type] + " está à " + ((props.price[i] / props.price[props.type]) * 100).toFixed(2) + "% de " + typen[i])
     });
 
     return (
         <View style={[styles.rcard, props.style]}>
             <Text>Abasteça com: {typen[props.type]}</Text>
-            <Text>{b.join('\n')}</Text>
+            <Text style={styles.lowtext}>{b.join('\n')}</Text>
         </View>
     );
 }
 
 const styles = StyleSheet.create({
 	rcard: {
-		flex: 1,
 		backgroundColor: '#fcc',
 		alignItems: 'center',
 		justifyContent: 'center',
         borderRadius: 8,
         padding: 12
 	},
+    but: {
+		backgroundColor: '#8f8',
+		alignItems: 'center',
+		justifyContent: 'center',
+        borderRadius: 8,
+        padding: 12,
+        margin: 12
+    },
+    lowtext: {
+        color: '#0006'
+    }
 });
 
 module.exports = { AppButton, ResultCard, Combustivel };
