@@ -3,11 +3,13 @@ import { StyleSheet, View, Text, Pressable } from 'react-native';
 
 const Combustivel = Object.freeze({
     Etanol: 0,
-    Gasolina: 1
+    Gasolina: 1,
+    Diesel: 2
 }),
 typen = Object.freeze([
     'Etanol',
-    'Gasolina'
+    'Gasolina',
+    'Diesel'
 ]);
 
 function AppButton(props)
@@ -16,8 +18,10 @@ function AppButton(props)
     const [txt, setTXT] = useState("");
 
     const calcT = (up = false, set1, set2) => {
-        let mx = 0, r = -1, tarr = [];
+        let mx = 0, r = -1, r2 = -1, tarr = [];
         props.price.forEach((e, i) => {
+            if (e >= mx)
+                r2 = i;
             if (e > mx)
             {
                 mx = Math.max(mx, e);
@@ -25,8 +29,11 @@ function AppButton(props)
             }
 
             if (up)
-                tarr.push("Preço de " + typen[i] + ": R$" + e);
+                tarr.push("Preço de " + typen[i] + ": R$" + e.toFixed(2));
         });
+
+        if (r !== r2)
+            r = -2;
 
         props.set(r);
         setT(r);
@@ -46,25 +53,35 @@ function AppButton(props)
 
 function ResultCard(props)
 {
-    if (props.type == -1 || props.type == undefined)
+    if (props.type == -1)
     {
         return (
             <View style={styles.rcard}>
-                <Text>Abasteça com qualquer coisa.</Text>
+                <Text>Pressione o botão para calcular.</Text>
             </View>
         );
     }
 
     const b = [];
-    typen.forEach((e, i) => {
-        if (i == props.type)
-            return;
-        b.push(typen[props.type] + " está à " + ((props.price[i] / props.price[props.type]) * 100).toFixed(2) + "% de " + typen[i])
-    });
+    if (props.type != -1)
+    {
+        typen.forEach((e, i) => {
+            if (i == props.type)
+                return;
+            if (props.type == -2)
+                b.push(typen[i] + " está à R$" + props.price[i]);
+            else
+                b.push(typen[props.type] + " está à " + ((props.price[i] / props.price[props.type]) * 100).toFixed(2) + "% de " + typen[i]);
+        });
+    }
+
+    let text = (<Text>Abasteça com: {typen[props.type]}</Text>);
+    if (props.type == -2)
+        text = (<Text>Uma ou mais opções são igualmente boas.</Text>);
 
     return (
         <View style={[styles.rcard, props.style]}>
-            <Text>Abasteça com: {typen[props.type]}</Text>
+            {text}
             <Text style={styles.lowtext}>{b.join('\n')}</Text>
         </View>
     );
