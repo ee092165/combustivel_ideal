@@ -18,13 +18,13 @@ function AppButton(props)
     const [txt, setTXT] = useState("");
 
     const calcT = (up = false, set1, set2) => {
-        let mx = 0, r = -1, r2 = -1, tarr = [];
+        let mn = 10000, r = -1, r2 = -1, tarr = [];
         props.price.forEach((e, i) => {
-            if (e >= mx)
+            if (e <= mn)
                 r2 = i;
-            if (e > mx)
+            if (e < mn)
             {
-                mx = Math.max(mx, e);
+                mn = Math.min(mn, e);
                 r = i;
             }
 
@@ -71,13 +71,15 @@ function ResultCard(props)
             if (props.type == -2)
                 b.push(typen[i] + " está à R$" + props.price[i]);
             else
-                b.push(typen[props.type] + " está à " + ((props.price[i] / props.price[props.type]) * 100).toFixed(2) + "% de " + typen[i]);
+                b.push(typen[props.type] + " está à " + ((props.price[props.type] / props.price[i]) * 100).toFixed(2) + "% de " + typen[i]);
         });
     }
 
-    let text = (<Text>Abasteça com: {typen[props.type]}</Text>);
+    let text = (<Text>Mais barato: {typen[props.type]}</Text>);
     if (props.type == -2)
         text = (<Text>Uma ou mais opções são igualmente boas.</Text>);
+	if (props.type == Combustivel.Etanol && (props.price[Combustivel.Etanol] >= props.price[Combustivel.Gasolina] * 0.7))
+		text = (<Text>Apesar de Etanol ser mais barato, Gasolina é o mais benéfico.</Text>);
 
     return (
         <View style={[styles.rcard, props.style]}>

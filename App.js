@@ -18,6 +18,12 @@ export default function App()
 			prices[Combustivel.Etanol] = 3.49; // Fixo, mas pode ser ajustado
 			prices[Combustivel.Gasolina] = Number(json.precos.gasolina.br.replace(',', '.'));
 			prices[Combustivel.Diesel] = Number(json.precos.diesel.br.replace(',', '.'));
+			
+			// Testar verificação se etanol é < 70% de gasolina
+			prices[Combustivel.Etanol] = 3.49;
+			prices[Combustivel.Gasolina] = 4.00;
+			prices[Combustivel.Diesel] = 9999.00;
+			
 			setPrices(prices);
 		}
 		catch (error)
